@@ -1,0 +1,280 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script src="http://cdn.bootcss.com/jquery/3.0.0-alpha1/jquery.min.js"></script>
+    <style type="text/css">
+        progress {
+            display: inline-block;
+            width: 160px;
+            height: 8px;
+            border: 1px solid #0064B4;
+            background-color:#e6e6e6;
+            color: #0064B4; /*IE10*/
+        }
+        /*ie6-ie9*/
+        progress ie {
+            display:block;
+            height: 100%;
+            background: #0064B4;
+        }
+
+
+        progress::-moz-progress-bar { background: #0064B4; }
+        progress::-webkit-progress-bar { background: #e6e6e6; }
+        progress::-webkit-progress-value  { background: #0064B4; }
+
+
+        body,table{
+            font-size:14px;
+        }
+        table{
+            table-layout:fixed;
+            empty-cells:show;
+            border-collapse: collapse;
+            margin:0 auto;
+            border:1px solid #cad9ea;
+            color:#666;
+        }
+        table th {
+            background-repeat:repeat-x;
+            height:30px;
+        }
+        table td,table th{
+            border:1px solid #cad9ea;
+            padding: 2px;
+        }
+        table tr.alter{
+            background-color:#f5fafe;
+        }
+
+        body{
+            padding: 1em;
+        }
+        a{
+            color: #739931;
+        }
+
+        table th,
+        table td{
+            text-align: left;
+        }
+        table.layout{
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table.display th,
+        table.display td{
+            border: 1px solid #B3BFAA;
+            padding: .5em 1em;
+        }
+
+        table.display th{ background: #D5E0CC; }
+        table.display td{ background: #fff; }
+
+        table.responsive-table{
+            box-shadow: 0 1px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 30em){
+            table.responsive-table{
+                box-shadow: none;
+            }
+            table.responsive-table thead{
+                display: none;
+            }
+            table.display th,
+            table.display td{
+                padding: .5em;
+            }
+
+            table.responsive-table td:nth-child(1):before{
+                content: 'Number';
+            }
+            table.responsive-table td:nth-child(2):before{
+                content: 'Name';
+            }
+            table.responsive-table td:nth-child(1),
+            table.responsive-table td:nth-child(2){
+                padding-left: 25%;
+            }
+            table.responsive-table td:nth-child(1):before,
+            table.responsive-table td:nth-child(2):before{
+                position: absolute;
+                left: .5em;
+                font-weight: bold;
+            }
+
+            table.responsive-table tr,
+            table.responsive-table td{
+                display: block;
+            }
+            table.responsive-table tr{
+                position: relative;
+                box-shadow: 0 1px 10px rgba(0, 0, 0, 0.2);
+            }
+            table.responsive-table td{
+                border-top: none;
+            }
+            table.responsive-table td.organisationnumber{
+                background: #D5E0CC;
+                border-top: 1px solid #B3BFAA;
+            }
+            table.responsive-table td.actions{
+                position: absolute;
+                top: 0;
+                right: 0;
+                border: none;
+                background: none;
+            }
+        }
+        table{
+            box-shadow: 0 1px 20px rgba(0, 0, 0, 0.2);
+            background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAQElEQVQIW2P89OvDfwYo+PHjJ4zJwMHBzsAIk0SXAKkCS2KTAEu++vQSbizIKGQAl0SXAJkGlsQmAbcT2Shk+wH0sCzAEOZW1AAAAABJRU5ErkJggg==);
+        }
+
+        #top
+        { display: block;
+            z-index: 100;
+            top:0px;
+            position:fixed;
+            _top: expression_r(documentElement.scrollTop + "px");
+            background-repeat: repeat-x;
+            height: 90px;
+            margin: 0;
+            width: 100%;
+            left: 0px;
+        }
+    </style>
+    <script>
+        if (typeof window.screenX !== "number") {
+            document.createElement("progress");
+            document.createElement("ie");
+        }
+        /**
+         * 对Date的扩展，将 Date 转化为指定格式的String
+         * 月(M)、日(d)、12小时(h)、24小时(H)、分(m)、秒(s)、周(E)、季度(q) 可以用 1-2 个占位符
+         * 年(y)可以用 1-4 个占位符，毫秒(S)只能用 1 个占位符(是 1-3 位的数字)
+         * eg:
+         * (new Date()).pattern("yyyy-MM-dd hh:mm:ss.S") ==> 2006-07-02 08:09:04.423
+         * (new Date()).pattern("yyyy-MM-dd E HH:mm:ss") ==> 2009-03-10 二 20:09:04
+         * (new Date()).pattern("yyyy-MM-dd EE hh:mm:ss") ==> 2009-03-10 周二 08:09:04
+         * (new Date()).pattern("yyyy-MM-dd EEE hh:mm:ss") ==> 2009-03-10 星期二 08:09:04
+         * (new Date()).pattern("yyyy-M-d h:m:s.S") ==> 2006-7-2 8:9:4.18
+         */
+        Date.prototype.pattern=function(fmt) {
+            var o = {
+                "M+" : this.getMonth()+1, //月份
+                "d+" : this.getDate(), //日
+                "h+" : this.getHours()%12 == 0 ? 12 : this.getHours()%12, //小时
+                "H+" : this.getHours(), //小时
+                "m+" : this.getMinutes(), //分
+                "s+" : this.getSeconds(), //秒
+                "q+" : Math.floor((this.getMonth()+3)/3), //季度
+                "S" : this.getMilliseconds() //毫秒
+            };
+            var week = {
+                "0" : "/u65e5",
+                "1" : "/u4e00",
+                "2" : "/u4e8c",
+                "3" : "/u4e09",
+                "4" : "/u56db",
+                "5" : "/u4e94",
+                "6" : "/u516d"
+            };
+            if(/(y+)/.test(fmt)){
+                fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+            }
+            if(/(E+)/.test(fmt)){
+                fmt=fmt.replace(RegExp.$1, ((RegExp.$1.length>1) ? (RegExp.$1.length>2 ? "/u661f/u671f" : "/u5468") : "")+week[this.getDay()+""]);
+            }
+            for(var k in o){
+                if(new RegExp("("+ k +")").test(fmt)){
+                    fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+                }
+            }
+            return fmt;
+        }
+    </script>
+</head>
+<body>
+
+
+<div id="top">
+    <div style="background-color:#fff;border-bottom:5px solid #fffffc">
+        <center>
+            样本编号:  <b><span id="name"></span></b><br>
+
+            启动时间:<span id="startTime"></span>  - 退出时间:<span id="stopTime"></span><br>
+
+            <span style="color:red">刷新周期(>=1秒):</span><br>
+            <input type="text" value="1" id="refreshPeriod"/>
+            <input type="button" value="设置刷新时间" onClick="changePeriod()"/>
+        </center>
+    </div>
+
+    <table width=100% style='color:#000' class='layout display responsive-table'>
+        <tr>
+            <td width=3%>总容量</td>
+            <td width=3%>已经使用</td>
+            <td width=5%>发送数</td>
+            <td width=5%>发送成功</td>
+            <td width=5%>取出数</td>
+            <td width=5%>取出成功</td>
+        </tr>
+        <tr>
+            <td width=3% id="capacity"></td>
+            <td width=3% id="size"></td>
+            <td width=5% id="putattempt"></td>
+            <td width=5% id="putsuccess"></td>
+            <td width=5% id="takeattempt"></td>
+            <td width=5% id="takesuccess"></td>
+        </tr>
+    </table>
+</div>
+<div id="info" style="padding-top:50px"/>
+<script type="text/javascript">
+    var iid = null;
+    var changePeriod=function(){
+        var theTime=$("#refreshPeriod").val();
+        if(theTime<1) theTime = 1;
+        clearInterval(iid);
+        iid=self.setInterval("getData()",1000 * theTime);
+    };
+    var getData=function(){
+        $.getJSON("/channel", function(data) {
+            $("#name").html(data.name);
+
+            if(data.startTime > 0) {
+                var start = new Date();
+                start.setTime(data.startTime);
+                console.log(data.startTime + "--->" + start);
+                $("#startTime").html(start.pattern("yyyy-MM-dd HH:mm:ss"));
+            } else {
+                $("#startTime").html("-");
+            }
+
+            if(data.stopTime > 0) {
+                var stop = new Date();
+                stop.setTime(data.stopTime);
+                $("#stopTime").html(stop.pattern("yyyy-MM-dd HH:mm:ss"))
+            } else {
+                $("#stopTime").html("-");
+            }
+
+
+            $("#capacity").text(data.data.channelcapacity);
+            $("#size").text(data.data.channelcurrentsize);
+            $("#putattempt").text(data.data.channeleventputattempt);
+            $("#putsuccess").text(data.data.channeleventputsuccess);
+            $("#takeattempt").text(data.data.channeleventtakeattempt);
+            $("#takesuccess").html(data.data.channeleventtakesuccess);
+        });
+    };
+    $(document).ready(function(){
+        getData();
+        iid=self.setInterval("getData()",2000);
+    });
+</script>
+</body>
+</html>
