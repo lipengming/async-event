@@ -14,6 +14,7 @@
         <module>async-event-core</module>
         <module>async-event-jdbc</module>
         <module>async-event-monitor</module>
+        <module>async-event-server</module>
     </modules>
 
     <properties>
@@ -69,6 +70,10 @@
                     <exclusion>
                         <groupId>org.slf4j</groupId>
                         <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>

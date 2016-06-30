@@ -7,7 +7,6 @@ import com.cubbery.event.handler.EventHandler;
 
 import java.util.Date;
 
-
 /**
  * event 基础实现，mapping到数据库逻辑结构。
  */
