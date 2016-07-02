@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd" default-autowire="byName">
+
+    <!--TODO 配置数据源-->
+
+    <bean id="storage" class="com.cubbery.event.storage.JdbcEventStorage">
+        <constructor-arg index="0" ref="dataSource"/>
+        <constructor-arg index="1" value="ORACLE"/>
+    </bean>
+</beans>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd" default-autowire="byName">
+
+    <bean id="channel" class="com.cubbery.event.sample.channel.MonitoredPersistenceChannel">
+        <constructor-arg index="0" value="1024"/>
+        <constructor-arg index="1" ref="storage"/>
+        <constructor-arg index="2" ref="channelStatistics"/>
+    </bean>
+
+    <bean id="channelStatistics" class="com.cubbery.event.monitor.ChannelStatistics">
+        <constructor-arg value="channel_monitor_log"/>
+    </bean>
+
+    <bean id="httpSever" class="com.cubbery.event.monitor.log.LogMonitor" init-method="startUp" destroy-method="close">
+        <constructor-arg name="samples" >
+            <list>
+                <ref bean="channelStatistics"></ref>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="eventBus" class="com.cubbery.event.EventBus">
+        <constructor-arg name="channel" ref="channel"></constructor-arg>
+        <property name="retryService" ref="retryService"></property>
+    </bean>
+
+    <bean id="retryService" class="com.cubbery.event.retry.RetryService">
+        <constructor-arg name="eventBus" ref="eventBus"/>
+        <constructor-arg name="leasePeriod" value="60"/>
+        <constructor-arg name="masterWaitCount" value="2"/>
+        <constructor-arg name="priority" value="10"/>
+        <constructor-arg name="retryTaskCount" value="3"/>
+        <constructor-arg name="maxRetryCount" value="2"/>
+    </bean>
+
+</beans>

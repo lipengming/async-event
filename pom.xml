@@ -15,6 +15,7 @@
         <module>async-event-jdbc</module>
         <module>async-event-monitor</module>
         <module>async-event-server</module>
+        <module>async-event-example</module>
     </modules>
 
     <properties>
